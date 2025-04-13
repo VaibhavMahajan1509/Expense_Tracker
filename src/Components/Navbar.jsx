@@ -1,21 +1,30 @@
-// src/components/Navbar.jsx
 import { Link } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
+import { useState } from "react";
+import styles from "./Navbar.module.css";
 
 const Navbar = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div className="container">
-        <Link className="navbar-brand" to="/">Expense Tracker</Link>
-        <div className="collapse navbar-collapse justify-content-end">
-          <ul className="navbar-nav">
-            <li className="nav-item">
-              <Link className="nav-link" to="/login">Login</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/signup">Sign Up</Link>
-            </li>
-          </ul>
+    <nav className={styles.navbar}>
+      <div className={styles.container}>
+        <Link to="/" className={styles.logo}>
+          Expense Tracker
+        </Link>
+
+        <button className={styles.menuButton} onClick={toggleMenu}>
+          ☰
+        </button>
+
+        <div className={`${styles.navLinks} ${isMenuOpen ? styles.show : ""}`}>
+          <Link to="/login" className={styles.link} onClick={() => setIsMenuOpen(false)}>
+            Login
+          </Link>
+          <Link to="/signup" className={styles.link} onClick={() => setIsMenuOpen(false)}>
+            Sign Up
+          </Link>
         </div>
       </div>
     </nav>

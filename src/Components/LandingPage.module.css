@@ -1,6 +1,6 @@
 .heroSection {
   padding: 100px 20px;
-  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  background: linear-gradient(135deg, #7a40b7 0%, #0762fe 100%);
   color: #fff;
   border-radius: 20px;
   margin-top: 60px;
@@ -41,8 +41,8 @@
 
 .subtext {
   font-size: 1.5rem;
-  font-weight: 300;
-  color: #444;
+  font-weight: 700;
+  color: #050000;
   margin-top: 15px;
   animation: fadeIn 1.5s ease-in;
 }

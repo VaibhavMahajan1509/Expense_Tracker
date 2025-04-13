@@ -1,18 +1,18 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import styles from "./SignUp.module.css";
 
 const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(""); // 🔥 Add this line
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    setError(""); // Clear previous errors
+    setError("");
 
-    // 🔴 Password validation
     if (password.length < 6) {
       setError("Password must be at least 6 characters.");
       return;
@@ -21,7 +21,7 @@ const SignUp = () => {
     const auth = getAuth();
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      localStorage.setItem("user", email); // optional
+      localStorage.setItem("user", email);
       navigate("/dashboard");
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
@@ -36,39 +36,39 @@ const SignUp = () => {
   };
 
   return (
-    <form onSubmit={handleSignup} className="container mt-5" style={{ maxWidth: "400px" }}>
-      <h3 className="mb-4">Sign Up</h3>
+    <form onSubmit={handleSignup} className={styles.formWrapper}>
+      <h3 className={styles.title}>Sign Up</h3>
 
-      {error && <div className="alert alert-danger">{error}</div>}
+      {error && <div className={styles.error}>{error}</div>}
 
-      <div className="mb-3">
-        <label>Email</label>
+      <div className={styles.inputGroup}>
+        <label className={styles.label}>Email</label>
         <input
           type="email"
-          className="form-control"
+          className={styles.input}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
       </div>
 
-      <div className="mb-3">
-        <label>Password</label>
+      <div className={styles.inputGroup}>
+        <label className={styles.label}>Password</label>
         <input
           type="password"
-          className="form-control"
+          className={styles.input}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <small className="text-muted">Password must be at least 6 characters.</small>
+        <small className={styles.helperText}>
+          Password must be at least 6 characters.
+        </small>
       </div>
 
-      <button type="submit" className="btn btn-primary w-100">Sign Up</button>
+      <button type="submit" className={styles.submitBtn}>Sign Up</button>
     </form>
   );
 };
 
 export default SignUp;
-
-
