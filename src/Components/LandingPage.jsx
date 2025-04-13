@@ -5,7 +5,7 @@ import Footer from "./Footer";
 import styles from "./LandingPage.module.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-const LandingPage = () => {
+const Landingpage = () => {
   const navigate = useNavigate();
 
   return (
@@ -30,4 +30,4 @@ const LandingPage = () => {
   );
 };
 
-export default LandingPage;
+export default Landingpage;
