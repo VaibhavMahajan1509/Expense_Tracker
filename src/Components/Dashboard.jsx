@@ -49,7 +49,17 @@ const Dashboard = () => {
 
   const addExpense = () => {
     if (amount && description && date && !isNaN(amount)) {
-      setExpenses([...expenses, { amount: parseFloat(amount), description, category, date, id: Date.now() }]);
+      const newExpense = {
+        amount: parseFloat(amount),
+        description,
+        category,
+        date,
+        id: Date.now(),
+      };
+      const updatedExpenses = [newExpense, ...expenses].sort(
+        (a, b) => new Date(b.date) - new Date(a.date)
+      );
+      setExpenses(updatedExpenses);
       setAmount("");
       setDescription("");
       setDate("");
@@ -94,8 +104,7 @@ const Dashboard = () => {
     .filter((e) =>
       e.description.toLowerCase().includes(search.toLowerCase()) ||
       e.category.toLowerCase().includes(search.toLowerCase())
-    )
-    .sort((a, b) => new Date(b.date) - new Date(a.date));
+    );
 
   const downloadCSV = () => {
     const headers = ["Description", "Amount", "Category", "Date"];
@@ -126,21 +135,36 @@ const Dashboard = () => {
       </div>
 
       {showAlert && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={styles.alert}
-        >
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className={styles.alert}>
           Warning: Your expenses exceed your budget!
         </motion.div>
       )}
 
       <div className={styles.section}>
         <h3>📊 Set Monthly Budget</h3>
-        <input type="number" placeholder="Enter Budget" value={budgetInput} onChange={(e) => setBudgetInput(e.target.value)} />
+        <input
+          type="number"
+          placeholder="Enter Budget"
+          value={budgetInput}
+          onChange={(e) => setBudgetInput(e.target.value)}
+        />
         <motion.button whileTap={{ scale: 0.95 }} className={styles.btnPrimary} onClick={setMonthlyBudget}>
           Set Budget
         </motion.button>
+
+        {budget && (
+          <div className={styles.progressContainer}>
+            <div className={styles.progressBar}>
+              <div
+                className={styles.progressFill}
+                style={{ width: `${Math.min((totalExpenses / budget) * 100, 100)}%` }}
+              ></div>
+            </div>
+            <small>
+              ₹{totalExpenses} spent / ₹{budget}
+            </small>
+          </div>
+        )}
       </div>
 
       <div className={styles.section}>
@@ -154,7 +178,12 @@ const Dashboard = () => {
           <option value="Shopping">Shopping</option>
           <option value="Other">Other</option>
         </select>
-        <motion.button whileTap={{ scale: 0.95 }} className={styles.btnPrimary} onClick={addExpense} disabled={!description || !amount || !date}>
+        <motion.button
+          whileTap={{ scale: 0.95 }}
+          className={styles.btnPrimary}
+          onClick={addExpense}
+          disabled={!description || !amount || !date}
+        >
           Add Expense
         </motion.button>
       </div>
@@ -202,11 +231,7 @@ const Dashboard = () => {
       </div>
 
       {showVisualization && (
-        <motion.div
-          className={styles.chartContainer}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+        <motion.div className={styles.chartContainer} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={expenseData}>
               <XAxis dataKey="category" />
@@ -223,4 +248,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
