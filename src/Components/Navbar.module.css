@@ -1,6 +1,7 @@
 /* Navbar Styles */
 .navbar {
-  background-color: #576d77; /* Black background */
+  /* background-color: #3e4649; Black background */
+  background: linear-gradient(135deg, #408bb7 50%, #0762fe 100%);
   padding: 1rem 2rem; /* Add more padding for spacious feel */
   color: white;
   position: sticky;
@@ -25,7 +26,7 @@
 .logo {
   font-size: 1.8rem;
   font-weight: 700; /* Heavier font weight for prominence */
-  color: #ffc107; /* Bright yellow color */
+  color: white; /* Bright yellow color */
   text-decoration: none;
   transition: color 0.3s ease;
 }
@@ -38,7 +39,7 @@
   display: none;
   font-size: 2rem;
   background: none;
-  color: #ffc107;
+  color: white;
   border: none;
   cursor: pointer;
   transition: color 0.3s ease;
@@ -57,7 +58,7 @@
   color: white;
   text-decoration: none;
   font-weight: 500;
-  font-size: 1rem;
+  font-size: 1.4rem;
   position: relative;
   transition: color 0.3s ease, transform 0.3s ease;
 }
