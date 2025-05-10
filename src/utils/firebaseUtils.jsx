@@ -1,6 +1,7 @@
 import { getDatabase, ref, push, onValue, remove, update } from "firebase/database";
 import { auth } from "../firebase";
 
+console.log("API KEY:", import.meta.env.VITE_FIREBASE_API_KEY); 
 // Add a new expense
 export const addExpenseToFirebase = async (expense) => {
   const db = getDatabase();
