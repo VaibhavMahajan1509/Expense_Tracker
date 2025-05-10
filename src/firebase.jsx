@@ -1,15 +1,19 @@
-// src/firebase.js
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
+import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDB4LTgJCZ_rGhqDKXNGdmwWo1oDymuxAM",
-  authDomain: "expense-tracker-system-3cfa5.firebaseapp.com",
-  projectId: "expense-tracker-system-3cfa5",
-  storageBucket: "expense-tracker-system-3cfa5.appspot.com",
-  messagingSenderId: "970631159117",
-  appId: "1:970631159117:web:your_app_id_here", // Optional, can be added from Firebase console if needed
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
 };
 
+
 const app = initializeApp(firebaseConfig);
+console.log("Firebase initialized:", app);
 export const auth = getAuth(app);
+export const db = getDatabase(app);

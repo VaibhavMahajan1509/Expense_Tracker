@@ -2,67 +2,114 @@ import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { FaUtensils, FaPlane, FaShoppingCart, FaTag } from "react-icons/fa";
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer,
+} from "recharts";
+import {
+  FaUtensils, FaPlane, FaShoppingCart, FaTag, FaHeart,
+  FaBook, FaFilm, FaBolt, FaUserCircle
+} from "react-icons/fa";
 import { motion } from "framer-motion";
 import styles from "./Dashboard.module.css";
+import {
+  addExpenseToFirebase,
+  getExpensesFromFirebase,
+  deleteExpenseFromFirebase,
+  updateExpenseInFirebase
+} from "../utils/firebaseUtils";
 
 const categoryIcons = {
   Food: <FaUtensils />,
   Travel: <FaPlane />,
   Shopping: <FaShoppingCart />,
+  Health: <FaHeart />,
+  Education: <FaBook />,
+  Entertainment: <FaFilm />,
+  Utilities: <FaBolt />,
+  PersonalCare: <FaUserCircle />,
   Other: <FaTag />,
 };
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [expenses, setExpenses] = useState(() => JSON.parse(localStorage.getItem("expenses")) || []);
+  const [expenses, setExpenses] = useState([]);
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("Food");
   const [date, setDate] = useState("");
   const [budgetInput, setBudgetInput] = useState("");
-  const [budget, setBudget] = useState(() => parseFloat(localStorage.getItem("budget")) || "");
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("darkMode") === "true");
-  const [showAlert, setShowAlert] = useState(false);
-  const [showVisualization, setShowVisualization] = useState(false);
+  const [budget, setBudget] = useState("");
   const [search, setSearch] = useState("");
+  const [showVisualization, setShowVisualization] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [editId, setEditId] = useState(null);
+  const [editFields, setEditFields] = useState({
+    description: "",
+    amount: "",
+    category: "",
+    date: "",
+  });
 
   useEffect(() => {
-    localStorage.setItem("expenses", JSON.stringify(expenses));
-    localStorage.setItem("darkMode", darkMode);
-    localStorage.setItem("budget", budget);
+    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+      setLoading(true);
+      setError(null);
+      if (user) {
+        const unsubscribeExpenses = getExpensesFromFirebase((fetchedExpenses) => {
+          setExpenses(fetchedExpenses || []);
+          setLoading(false);
+        });
+        return () => unsubscribeExpenses();
+      } else {
+        setExpenses([]);
+        setBudget("");
+        setLoading(false);
+        navigate("/");
+      }
+    });
+    return () => unsubscribeAuth();
+  }, [navigate]);
 
-    const total = expenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+  useEffect(() => {
+    const total = parseFloat(
+      (expenses || []).reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0)
+    ).toFixed(2);
     setShowAlert(budget && total > budget);
-  }, [expenses, darkMode, budget]);
+  }, [expenses, budget]);
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      localStorage.removeItem("user");
       navigate("/");
     } catch (error) {
-      console.error("Logout error:", error);
+      setError("Logout error: " + error.message);
     }
   };
 
-  const addExpense = () => {
-    if (amount && description && date && !isNaN(amount)) {
-      const newExpense = {
-        amount: parseFloat(amount),
-        description,
-        category,
-        date,
-        id: Date.now(),
-      };
-      const updatedExpenses = [newExpense, ...expenses].sort(
-        (a, b) => new Date(b.date) - new Date(a.date)
-      );
-      setExpenses(updatedExpenses);
+  const addExpense = async () => {
+    if (!amount || !description || !date || isNaN(amount)) {
+      setError("Please fill in all fields with valid data.");
+      return;
+    }
+
+    const newExpense = {
+      amount: parseFloat(amount),
+      description,
+      category,
+      date,
+    };
+
+    try {
+      await addExpenseToFirebase(newExpense);
       setAmount("");
       setDescription("");
       setDate("");
+      setError(null);
+    } catch (error) {
+      setError("Error adding expense: " + error.message);
     }
   };
 
@@ -70,27 +117,48 @@ const Dashboard = () => {
     if (budgetInput && !isNaN(budgetInput)) {
       setBudget(parseFloat(budgetInput));
       setBudgetInput("");
+    } else {
+      setError("Please enter a valid budget amount.");
     }
   };
 
-  const deleteExpense = (id) => setExpenses(expenses.filter((e) => e.id !== id));
-
-  const editExpense = (id) => {
-    const exp = expenses.find((e) => e.id === id);
-    if (exp) {
-      setDescription(exp.description);
-      setAmount(exp.amount);
-      setCategory(exp.category);
-      setDate(exp.date);
-      deleteExpense(id);
+  const deleteExpense = async (id) => {
+    try {
+      await deleteExpenseFromFirebase(id);
+    } catch (error) {
+      setError("Error deleting expense: " + error.message);
     }
   };
 
-  const totalExpenses = parseFloat(
-    expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0)
-  ).toFixed(2);
+  const startEdit = (expense) => {
+    setEditId(expense.id);
+    setEditFields({
+      description: expense.description,
+      amount: expense.amount,
+      category: expense.category,
+      date: expense.date,
+    });
+  };
 
-  const expenseData = expenses.reduce((acc, e) => {
+  const saveEdit = async (id) => {
+    try {
+      await updateExpenseInFirebase(id, editFields);
+      setEditId(null);
+    } catch (error) {
+      setError("Error updating expense: " + error.message);
+    }
+  };
+
+  const cancelEdit = () => {
+    setEditId(null);
+  };
+
+  const filteredExpenses = (expenses || []).filter((e) =>
+    e.description.toLowerCase().includes(search.toLowerCase()) ||
+    e.category.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const expenseData = (expenses || []).reduce((acc, e) => {
     const found = acc.find((item) => item.category === e.category);
     if (found) {
       found.amount += parseFloat(e.amount) || 0;
@@ -100,39 +168,29 @@ const Dashboard = () => {
     return acc;
   }, []);
 
-  const filteredExpenses = expenses
-    .filter((e) =>
-      e.description.toLowerCase().includes(search.toLowerCase()) ||
-      e.category.toLowerCase().includes(search.toLowerCase())
-    );
-
-  const downloadCSV = () => {
-    const headers = ["Description", "Amount", "Category", "Date"];
-    const rows = expenses.map(exp => [exp.description, `₹${exp.amount}`, exp.category, exp.date]);
-    const csvContent = [headers, ...rows].map(row => row.join(",")).join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", "expense_report.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+  const totalExpenses = parseFloat(
+    (expenses || []).reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0)
+  ).toFixed(2);
 
   return (
     <div className={`${styles.dashboard} ${darkMode ? styles.dark : styles.light}`}>
       <div className={styles.header}>
         <h2>💸 Expense Tracker</h2>
         <div>
-          <motion.button whileHover={{ scale: 1.05 }} className={styles.btnSecondary} onClick={() => setDarkMode(!darkMode)}>
+          <motion.button whileHover={{ scale: 1.05 }} onClick={() => setDarkMode(!darkMode)} className={styles.btnSecondary}>
             {darkMode ? "Light Mode" : "Dark Mode"}
           </motion.button>
-          <motion.button whileHover={{ scale: 1.05 }} className={styles.btnDanger} onClick={handleLogout}>
+          <motion.button whileHover={{ scale: 1.05 }} onClick={handleLogout} className={styles.btnDanger}>
             Logout
           </motion.button>
         </div>
       </div>
+
+      {error && (
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className={styles.alert}>
+          {error}
+        </motion.div>
+      )}
 
       {showAlert && (
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className={styles.alert}>
@@ -142,23 +200,14 @@ const Dashboard = () => {
 
       <div className={styles.section}>
         <h3>📊 Set Monthly Budget</h3>
-        <input
-          type="number"
-          placeholder="Enter Budget"
-          value={budgetInput}
-          onChange={(e) => setBudgetInput(e.target.value)}
-        />
-        <motion.button whileTap={{ scale: 0.95 }} className={styles.btnPrimary} onClick={setMonthlyBudget}>
+        <input type="number" placeholder="Enter Budget" value={budgetInput} onChange={(e) => setBudgetInput(e.target.value)} />
+        <motion.button whileTap={{ scale: 0.95 }} onClick={setMonthlyBudget} className={styles.btnPrimary}>
           Set Budget
         </motion.button>
-
         {budget && (
           <div className={styles.progressContainer}>
             <div className={styles.progressBar}>
-              <div
-                className={styles.progressFill}
-                style={{ width: `${Math.min((totalExpenses / budget) * 100, 100)}%` }}
-              ></div>
+              <div className={styles.progressFill} style={{ width: `${Math.min((totalExpenses / budget) * 100, 100)}%` }}></div>
             </div>
             <small>
               ₹{totalExpenses} spent / ₹{budget}
@@ -173,61 +222,69 @@ const Dashboard = () => {
         <input type="number" placeholder="Amount (₹)" value={amount} onChange={(e) => setAmount(e.target.value)} />
         <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
         <select value={category} onChange={(e) => setCategory(e.target.value)}>
-          <option value="Food">Food</option>
-          <option value="Travel">Travel</option>
-          <option value="Shopping">Shopping</option>
-          <option value="Other">Other</option>
+          {Object.keys(categoryIcons).map((cat) => (
+            <option key={cat} value={cat}>{cat}</option>
+          ))}
         </select>
-        <motion.button
-          whileTap={{ scale: 0.95 }}
-          className={styles.btnPrimary}
-          onClick={addExpense}
-          disabled={!description || !amount || !date}
-        >
+        <motion.button whileTap={{ scale: 0.95 }} onClick={addExpense} className={styles.btnPrimary}>
           Add Expense
         </motion.button>
       </div>
 
       <div className={styles.section}>
         <h3>📋 Expense List</h3>
-        <input
-          type="text"
-          placeholder="Search by description or category"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        {filteredExpenses.length === 0 ? (
-          <p className={styles.empty}>No expenses found.</p>
+        {loading ? (
+          <p>Loading expenses...</p>
         ) : (
-          <ul className={styles.expenseList}>
-            {filteredExpenses.map((expense) => (
-              <motion.li
-                key={expense.id}
-                whileHover={{ scale: 1.02 }}
-                className={styles.expenseItem}
-              >
-                <div>
-                  <strong>{expense.description}</strong> - ₹{parseFloat(expense.amount).toFixed(2)} [{expense.category}] {categoryIcons[expense.category]}<br />
-                  <small>{expense.date}</small>
-                </div>
-                <div>
-                  <button className={styles.btnWarning} onClick={() => editExpense(expense.id)}>Edit</button>
-                  <button className={styles.btnDanger} onClick={() => deleteExpense(expense.id)}>Delete</button>
-                </div>
-              </motion.li>
-            ))}
-          </ul>
+          <>
+            <input type="text" placeholder="Search by description or category" value={search} onChange={(e) => setSearch(e.target.value)} />
+            {filteredExpenses.length === 0 ? (
+              <p className={styles.empty}>No expenses found.</p>
+            ) : (
+              <ul className={styles.expenseList}>
+                {filteredExpenses.map((expense) => (
+                  <motion.li key={expense.id} whileHover={{ scale: 1.02 }} className={styles.expenseItem}>
+                    {editId === expense.id ? (
+                      <div>
+                        <input value={editFields.description} onChange={(e) => setEditFields({ ...editFields, description: e.target.value })} />
+                        <input type="number" value={editFields.amount} onChange={(e) => setEditFields({ ...editFields, amount: e.target.value })} />
+                        <input type="date" value={editFields.date} onChange={(e) => setEditFields({ ...editFields, date: e.target.value })} />
+                        <select value={editFields.category} onChange={(e) => setEditFields({ ...editFields, category: e.target.value })}>
+                          {Object.keys(categoryIcons).map((cat) => (
+                            <option key={cat} value={cat}>{cat}</option>
+                          ))}
+                        </select>
+                        <button className={styles.btnPrimary} onClick={() => saveEdit(expense.id)}>Save</button>
+                        <button className={styles.btnWarning} onClick={cancelEdit}>Cancel</button>
+                      </div>
+                    ) : (
+                      <div>
+                        <strong>{expense.description}</strong> - ₹{parseFloat(expense.amount).toFixed(2)} [{expense.category}]
+                        {categoryIcons[expense.category] || ""}<br />
+                        <small>{expense.date}</small>
+                      </div>
+                    )}
+                    {editId !== expense.id && (
+                      <div>
+                        <button className={styles.btnSecondary} onClick={() => startEdit(expense)}>Edit</button>
+                        <button className={styles.btnWarning} onClick={() => deleteExpense(expense.id)}>Delete</button>
+                      </div>
+                    )}
+                  </motion.li>
+                ))}
+              </ul>
+            )}
+            <div className={styles.totalExpense}>
+              <h5>Total Expense: ₹{totalExpenses}</h5>
+            </div>
+          </>
         )}
-        <div className={styles.totalExpense}>
-          <h5>Total Expense: ₹{totalExpenses}</h5>
-        </div>
       </div>
 
       <div className={styles.section}>
         <motion.button whileTap={{ scale: 0.95 }} onClick={() => setShowVisualization(!showVisualization)} className={styles.btnSecondary}>
           {showVisualization ? "Hide Visualization" : "Show Visualization"}
         </motion.button>
-        <motion.button whileTap={{ scale: 0.95 }} onClick={downloadCSV} className={styles.btnPrimary}>Download CSV</motion.button>
       </div>
 
       {showVisualization && (

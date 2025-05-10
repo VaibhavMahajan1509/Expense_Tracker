@@ -1,7 +1,9 @@
 // src/components/Footer.jsx
+import styles from "./Footer.module.css";
+
 const Footer = () => {
     return (
-      <footer className="bg-dark text-white text-center py-3 mt-auto">
+      <footer className={styles.footer}>
         <p>&copy; {new Date().getFullYear()} Expense Tracker. All rights reserved.</p>
       </footer>
     );

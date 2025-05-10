@@ -1,0 +1,12 @@
+/* src/components/Footer.module.css */
+
+.footer {
+    background: linear-gradient(135deg, #408bb7 50%, #0762fe 100%);
+    color: white;
+    text-align: center;
+    padding: 1rem 0;
+    margin-top: auto;
+    font-size: 0.95rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
