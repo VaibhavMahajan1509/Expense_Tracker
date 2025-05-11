@@ -1,31 +1,116 @@
+.main {
+  padding-top: 60px;
+  padding-bottom: 60px;
+}
+
 .heroSection {
-  padding: 100px 20px;
-  background: linear-gradient(135deg, #408bb7 50%, #0762fe 100%);
+  position: relative;
+  background-color: white;
+  border-radius: 30px;
+  padding: 60px 40px;
+  /* box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1); */
   color: #fff;
-  border-radius: 20px;
-  margin-top: 60px;
-  text-align: center;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
   animation: fadeInUp 1s ease-out forwards;
   opacity: 0;
   transform: translateY(30px);
 }
 
-/* Animation keyframes */
+.heroSection::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url("https://www.transparenttextures.com/patterns/cubes.png");
+  opacity: 0.06;
+  z-index: 0;
+}
+
+.blobBackground {
+  position: absolute;
+  top: -100px;
+  left: -100px;
+  width: 500px;
+  height: 500px;
+  z-index: 0;
+  opacity: 0.3;
+  animation: rotateBlob 40s linear infinite;
+}
+
+@keyframes rotateBlob {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.heroImage {
+  max-height: 400px;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  z-index: 1;
+  position: relative;
+}
+
+.heading {
+  font-family: 'Poppins', sans-serif;
+  font-size: 3.25rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+  color: black;
+  z-index: 1;
+  position: relative;
+  animation: slideIn 1s ease-out;
+}
+
+.typingEffect {
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: black;
+  margin-bottom: 15px;
+  display: block;
+  z-index: 1;
+}
+
+.subtext {
+  font-size: 1.3rem;
+  font-weight: 500;
+  margin-top: 10px;
+  color: black;
+  z-index: 1;
+  position: relative;
+  animation: fadeIn 1.5s ease-in;
+}
+
+.ctaButton {
+  margin-top: 35px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 14px 32px;
+  border-radius: 40px;
+  background-color: #ffffff;
+  color: #2563eb;
+  border: none;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  animation: bounceIn 2s ease-in;
+}
+
+.ctaButton:hover {
+  background-color: #e3ecff;
+  color: #1747a2;
+  transform: scale(1.05);
+}
+
 @keyframes fadeInUp {
   to {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.heading {
-  font-family: 'Poppins', sans-serif;
-  font-size: 3.5rem;
-  font-weight: 800;
-  color: #212529;
-  margin-bottom: 20px;
-  animation: slideIn 1s ease-out;
 }
 
 @keyframes slideIn {
@@ -39,14 +124,6 @@
   }
 }
 
-.subtext {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #050000;
-  margin-top: 15px;
-  animation: fadeIn 1.5s ease-in;
-}
-
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -55,27 +132,6 @@
     opacity: 1;
   }
 }
-
-.ctaButton {
-  margin-top: 40px;
-  font-size: 1.25rem;
-  font-weight: 600;
-  padding: 14px 35px;
-  border-radius: 30px;
-  background-color: #ffffff;
-  color: #2575fc;
-  border: none;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease-in-out;
-  animation: bounceIn 2s ease-in;
-}
-
-.ctaButton:hover {
-  background-color: #e1e8ff;
-  color: #6a11cb;
-  transform: scale(1.05);
-}
-
 
 @keyframes bounceIn {
   0% {
@@ -88,25 +144,5 @@
   }
   100% {
     transform: scale(1);
-  }
-}
-
-/* Responsive tweaks */
-@media (max-width: 768px) {
-  .heroSection {
-    padding: 60px 10px;
-  }
-
-  .heading {
-    font-size: 2.5rem;
-  }
-
-  .subtext {
-    font-size: 1.1rem;
-  }
-
-  .ctaButton {
-    font-size: 1.1rem;
-    padding: 12px 25px;
   }
 }
