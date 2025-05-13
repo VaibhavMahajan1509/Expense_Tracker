@@ -8,7 +8,9 @@ const Navbar = () => {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   return (
+    
     <nav className={styles.navbar}>
+      
       <div className={styles.container}>
         <Link to="/" className={styles.logo}>
           Expense Tracker

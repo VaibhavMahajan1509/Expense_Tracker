@@ -1,7 +1,7 @@
 /* src/components/Footer.module.css */
 
 .footer {
-    background: linear-gradient(135deg, #0599ef 50%, #0762fe 100%);
+    background: linear-gradient(35deg, #0599ef 50%, #0762fe 100%);
     color: white;
     text-align: center;
     padding: 1rem 0;

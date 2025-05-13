@@ -265,10 +265,11 @@ const Dashboard = () => {
                       </div>
                     )}
                     {editId !== expense.id && (
-                      <div>
-                        <button className={styles.btnSecondary} onClick={() => startEdit(expense)}>Edit</button>
-                        <button className={styles.btnWarning} onClick={() => deleteExpense(expense.id)}>Delete</button>
-                      </div>
+                      <div className={styles.actionButtons}>
+                           <button className={styles.btnSecondary} onClick={() => startEdit(expense)}>Edit</button>
+                           <button className={styles.btnWarning} onClick={() => deleteExpense(expense.id)}>Delete</button>
+                     </div>
+
                     )}
                   </motion.li>
                 ))}

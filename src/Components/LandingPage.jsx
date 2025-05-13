@@ -51,8 +51,8 @@ const LandingPage = () => {
             </p>
 
             <button
-              className={`btn ${styles.ctaButton}`}
-              onClick={() => navigate("/dashboard")}
+              className={styles.ctaButton}
+              onClick={() => navigate("/login")}
             >
               Get Started
             </button>
@@ -66,9 +66,49 @@ const LandingPage = () => {
             />
           </div>
         </div>
-      </main>
+        {/* Features Section */}
+<section className={`mt-5 ${styles.featuresSection}`}>
+  <h2 className="text-center mb-4">Why Use This App?</h2>
+  <div className="row text-center">
+    <div className="col-md-4">
+      <img src="./secure.svg" alt="Secure" className={styles.featureIcon} />
+      <h5>Secure Login</h5>
+      <p>Sign in safely with Firebase Authentication.</p>
+    </div>
+    <div className="col-md-4">
+      <img src="./real-time.svg" alt="Real-time Data" className={styles.featureIcon} />
+      <h5>Real-Time Sync</h5>
+      <p>Your expenses update live with Firebase Database.</p>
+    </div>
+    <div className="col-md-4">
+      <img src="./graph.svg" alt="Visualization" className={styles.featureIcon} />
+      <h5>Smart Visual Insights</h5>
+      <p>Bar charts help you quickly analyze your spending.</p>
+    </div>
+  </div>
+</section>
 
-      <Footer />
+{/* How It Works Section */}
+<section className={`mt-5 ${styles.howItWorks}`}>
+  <h2 className="text-center mb-4">How It Works</h2>
+  <div className="row text-center">
+    <div className="col-md-4">
+      <h5>1️⃣ Sign Up or Log In</h5>
+      <p>Create your account securely with Firebase.</p>
+    </div>
+    <div className="col-md-4">
+      <h5>2️⃣ Add Your Expenses</h5>
+      <p>Fill out forms to track daily expenses and categories.</p>
+    </div>
+    <div className="col-md-4">
+      <h5>3️⃣ View Dashboard</h5>
+      <p>Analyze your finances through interactive visuals.</p>
+    </div>
+  </div>
+</section>
+
+      </main>
+ <Footer />
     </div>
   );
 };

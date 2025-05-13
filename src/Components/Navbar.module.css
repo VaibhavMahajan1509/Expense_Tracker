@@ -26,13 +26,13 @@
 .logo {
   font-size: 1.8rem;
   font-weight: 700; /* Heavier font weight for prominence */
-  color: white; /* Bright yellow color */
+  color: white;; /* Bright yellow color */
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
 .logo:hover {
-  color: #ffeb3b; /* Lighter yellow on hover */
+  color:  #084eff; /* Lighter yellow on hover */
 }
 
 .menuButton {
@@ -64,7 +64,7 @@
 }
 
 .link:hover {
-  color: #ffc107; /* Yellow color on hover */
+  color: rgb(251, 251, 251); /* Yellow color on hover */
   transform: translateY(-3px); /* Slight lift effect on hover */
 }
 
@@ -75,7 +75,7 @@
   left: 0;
   width: 0;
   height: 2px;
-  background-color: #ffc107;
+  background-color: #d802fe;
   transition: width 0.3s ease;
 }
 

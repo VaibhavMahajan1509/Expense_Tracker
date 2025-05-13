@@ -8,7 +8,6 @@
   background-color: white;
   border-radius: 30px;
   padding: 60px 40px;
-  /* box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1); */
   color: #fff;
   overflow: hidden;
   animation: fadeInUp 1s ease-out forwards;
@@ -51,9 +50,22 @@
 .heroImage {
   max-height: 400px;
   border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  /* box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); */
   z-index: 1;
   position: relative;
+  animation: floatUpDown 2s ease-in-out infinite;
+}
+
+@keyframes floatUpDown {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
 
 .heading {
@@ -93,7 +105,7 @@
   padding: 14px 32px;
   border-radius: 40px;
   background-color: #ffffff;
-  color: #2563eb;
+  color: black;
   border: none;
   transition: all 0.3s ease-in-out;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
@@ -101,11 +113,12 @@
 }
 
 .ctaButton:hover {
-  background-color: #e3ecff;
-  color: #1747a2;
+  background-color: rgb(0, 106, 255);
+  color: black;
   transform: scale(1.05);
 }
 
+/* Animations */
 @keyframes fadeInUp {
   to {
     opacity: 1;
@@ -146,3 +159,17 @@
     transform: scale(1);
   }
 }
+
+.featuresSection,
+.howItWorks {
+  padding: 40px 0;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  margin-top: 60px;
+}
+
+.featureIcon {
+  width: 80px;
+  margin-bottom: 15px;
+}
+
